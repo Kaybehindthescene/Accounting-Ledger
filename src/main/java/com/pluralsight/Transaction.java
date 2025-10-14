@@ -1,5 +1,6 @@
 package com.pluralsight;
 
+import javax.swing.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -53,6 +54,28 @@ public class Transaction {
         return date + "|" + formattedTime + "|" + description + "|" + vendor + "|" + amount;
     }
 
+   public static Transaction fromCsvLine(String line) {
+// this is how I split the CvsLine along the | delimeters
+        String[] parts = line.split("\\|");
+
+        //guard
+       if (parts.length != 5) {
+           throw new IllegalArgumentException("Bad Csv:" + line);
+       }
+
+       //parse the fields and add a trim so the spaces wont be there
+       var date = LocalDate.parse(parts[0].trim());
+       var time = LocalTime.parse(parts[1].trim());
+       var description = parts[2].trim();
+       var vendor = parts[3].trim();
+       var amount = new BigDecimal(parts[4].trim());
+
+       //build the project
+       return new Transaction(date, time, description, vendor,amount);
+   }
+
+
+
     public static void main(String[] args) {
         Transaction t = new Transaction(
                 java.time.LocalDate.now(),
@@ -63,6 +86,12 @@ public class Transaction {
         );
 
         System.out.println(t.toCsvLine());
+
+        String s = "2025-10-14|19:26:33|Groceries|Walmart|-42.50";
+        Transaction t2 = Transaction.fromCsvLine(s);
+        System.out.println(t2.toCsvLine());
+
     }
+
 
 }
