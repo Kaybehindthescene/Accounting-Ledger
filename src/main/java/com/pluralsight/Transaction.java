@@ -3,6 +3,8 @@ package com.pluralsight;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
 
 public class Transaction {
     private LocalDate date;
@@ -43,7 +45,12 @@ public class Transaction {
     }
 
     public String toCsvLine() {
-        return date + "|" + time + "|" + description + "|" + vendor + "|" + amount;
+//Adding a formatter to my time so it could be in the format of the model
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+        String formattedTime = time.format(timeFormatter);
+
+        return date + "|" + formattedTime + "|" + description + "|" + vendor + "|" + amount;
     }
 
     public static void main(String[] args) {
