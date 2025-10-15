@@ -37,31 +37,30 @@ public class AccountingLedger {
             }
         }
 
-        private static void addDeposit(Scanner scanner, TransactionsFile file,) throws IOException {
-            System.out.println("\n--- Add Deposit ---");
+    }
 
-            System.out.println("Enter Description:");
-            String description = scanner.nextLine();
+    private static void addDeposit(Scanner scanner, TransactionsFile file,) throws IOException {
+        System.out.println("\n--- Add Deposit ---");
 
-            System.out.println("Enter vendor");
-            String vendor = scanner.nextLine();
+        System.out.println("Enter Description:");
+        String description = scanner.nextLine();
 
-            System.out.println("Enter Amount:");
-            BigDecimal amount = new BigDecimal(scanner.nextLine());
+        System.out.println("Enter vendor");
+        String vendor = scanner.nextLine();
 
-            Transaction deposit = new Transaction(
-                    LocalDate.now(),
-                    LocalTime.now(),
-                    description,
-                    vendor,
-                    amount
-            );
+        System.out.println("Enter Amount:");
+        BigDecimal amount = new BigDecimal(scanner.nextLine());
 
-            file.append(deposit);
-            System.out.println("Deposit added successfully");
-        }
+        Transaction deposit = new Transaction(
+                LocalDate.now(),
+                LocalTime.now(),
+                description,
+                vendor,
+                amount
+        );
 
-
+        file.append(deposit);
+        System.out.println("Deposit added successfully");
     }
 
 
