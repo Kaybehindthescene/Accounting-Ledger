@@ -109,6 +109,7 @@ public class AccountingLedger {
             System.out.println(t.toCsvLine());
 
         }
+        System.out.println("\nBalance: " + balanceOf(all));
     }
 
     private static List<Transaction> newestFirst(List<Transaction> input) {
@@ -120,6 +121,14 @@ public class AccountingLedger {
         });
         return list;
     }
+
+    private static java.math.BigDecimal balanceOf(List<Transaction> input) {
+        var sum = BigDecimal.ZERO;
+        for (var t : input) sum = sum.add(t.getAmount());
+        return sum;
+    }
+
+
 
 
 }
