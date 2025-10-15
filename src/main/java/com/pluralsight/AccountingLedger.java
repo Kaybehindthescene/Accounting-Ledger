@@ -95,22 +95,39 @@ public class AccountingLedger {
         System.out.println("Payment recorded successfully");
     }
 
-    private static void viewLedger(TransactionsFile file) throws IOException{
-        System.out.println("\n--- Ledger: All (newest first) ---");
+    private static void viewLedger(TransactionsFile file) throws java.io.IOException {
+        var all = file.loadAll();  // Load every transaction from file
 
-        //loads all from file
-        var all = file.loadAll();
+        System.out.println("\n--- Ledger Menu ---");
+        System.out.println("A) All (newest first)");
+        System.out.println("D) Deposits only");
+        System.out.println("P) Payments only");
+        System.out.println("V) Search by vendor");
+        System.out.println("B) Show balance");
+        System.out.println("H) Home");
+        System.out.print("Choose: ");
 
-        //sorts by newest first
-        var sorted = newestFirst(all);
+        var sc = new java.util.Scanner(System.in);
+        var c = sc.nextLine().trim().toUpperCase();
 
-        //print
-        for (var t : sorted) {
-            System.out.println(t.toCsvLine());
-
+        if (c.equals("A")) {
+            for (var t : newestFirst(all)) System.out.println(t.toCsvLine());
+        } else if (c.equals("D")) {
+            for (var t : newestFirst(depositsOnly(all))) System.out.println(t.toCsvLine());
+        } else if (c.equals("P")) {
+            for (var t : newestFirst(paymentsOnly(all))) System.out.println(t.toCsvLine());
+        } else if (c.equals("V")) {
+            System.out.print("Vendor search: ");
+            var q = sc.nextLine().trim();
+            var hits = newestFirst(searchByVendor(all, q));
+            for (var t : hits) System.out.println(t.toCsvLine());
+        } else if (c.equals("B")) {
+            System.out.println("Balance: " + balanceOf(all));
+        } else {
+            System.out.println("Back to Home.");
         }
-        System.out.println("\nBalance: " + balanceOf(all));
     }
+
 
     private static List<Transaction> newestFirst(List<Transaction> input) {
         var list = new ArrayList<>(input);
@@ -128,28 +145,52 @@ public class AccountingLedger {
         return sum;
     }
 
-    //Deposits only(positive amounts)
-    private static List<Transaction> depositOnly(List<Transaction> input) {
+    //  positive amounts only
+    private static List<Transaction> depositsOnly(List<Transaction> input) {
         var out = new ArrayList<Transaction>();
         for (var t : input) {
-            if (t.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+            if (t.getAmount().compareTo(java.math.BigDecimal.ZERO) > 0) {
                 out.add(t);
             }
         }
         return out;
     }
 
-    // Payments only (negative amounts)
-    private static List<Transaction> paymentOnly(List<Transaction> input) {
+    //  negative amounts only
+    private static List<Transaction> paymentsOnly(List<Transaction> input) {
         var out = new ArrayList<Transaction>();
         for (var t : input) {
-            if (t.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+            if (t.getAmount().compareTo(java.math.BigDecimal.ZERO) < 0) {
                 out.add(t);
             }
         }
         return out;
     }
 
+    // 🔍 vendor contains (case-insensitive)
+    private static List<Transaction> searchByVendor(List<Transaction> input, String query) {
+        var q = query.toLowerCase();
+        var out = new ArrayList<Transaction>();
+        for (var t : input) {
+            if (t.getVendor().toLowerCase().contains(q)) {
+                out.add(t);
+            }
+        }
+        return out;
+    }
+
+    private static void runningBalance(List<Transaction> input) {
+        var list = newestFirst(input);
+        var running = BigDecimal.ZERO;
+
+        //so the program computes correctly need the list in oldest - newest order
+        java.util.Collections.reverse(list);
+
+        for (var t : list) {
+            running = running.add(t.getAmount());
+            System.out.println(t.toCsvLine() + " | balance=" + running);
+        }
+    }
 
 
 
