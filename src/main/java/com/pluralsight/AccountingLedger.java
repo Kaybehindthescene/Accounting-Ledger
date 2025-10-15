@@ -5,7 +5,9 @@ import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 import java.util.Scanner;
 
 public class AccountingLedger {
@@ -39,7 +41,7 @@ public class AccountingLedger {
 
     }
 
-    private static void addDeposit(Scanner scanner, TransactionsFile file,) throws IOException {
+    private static void addDeposit(Scanner scanner, TransactionsFile file) throws IOException {
         System.out.println("\n--- Add Deposit ---");
 
         System.out.println("Enter Description: ");
@@ -91,6 +93,32 @@ public class AccountingLedger {
 
         file.append(payment);
         System.out.println("Payment recorded successfully");
+    }
+
+    private static void viewLedger(TransactionsFile file) throws IOException{
+        System.out.println("\n--- Ledger: All (newest first) ---");
+
+        //loads all from file
+        var all = file.loadAll();
+
+        //sorts by newest first
+        var sorted = newestFirst(all);
+
+        //print
+        for (var t : sorted) {
+            System.out.println(t.toCsvLine());
+
+        }
+    }
+
+    private static List<Transaction> newestFirst(List<Transaction> input) {
+        var list = new ArrayList<>(input);
+        list.sort((a, b) ->{
+            int byDate = b.getDate().compareTo(a.getDate());
+            if (byDate != 0) return byDate;
+            return b.getTime().compareTo(a.getTime());
+        });
+        return list;
     }
 
 
