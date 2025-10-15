@@ -104,6 +104,7 @@ public class AccountingLedger {
         System.out.println("P) Payments only");
         System.out.println("V) Search by vendor");
         System.out.println("B) Show balance");
+        System.out.println("R) Running balance");
         System.out.println("H) Home");
         System.out.print("Choose: ");
 
@@ -123,6 +124,8 @@ public class AccountingLedger {
             for (var t : hits) System.out.println(t.toCsvLine());
         } else if (c.equals("B")) {
             System.out.println("Balance: " + balanceOf(all));
+        }else if (c.equals("R")) {
+            runningBalance(all);
         } else {
             System.out.println("Back to Home.");
         }
