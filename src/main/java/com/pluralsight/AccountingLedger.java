@@ -42,7 +42,7 @@ public class AccountingLedger {
     private static void addDeposit(Scanner scanner, TransactionsFile file,) throws IOException {
         System.out.println("\n--- Add Deposit ---");
 
-        System.out.println("Enter Description:");
+        System.out.println("Enter Description: ");
         String description = scanner.nextLine();
 
         System.out.println("Enter vendor");
@@ -61,6 +61,36 @@ public class AccountingLedger {
 
         file.append(deposit);
         System.out.println("Deposit added successfully");
+    }
+
+    private static void makePayment(Scanner scanner, TransactionsFile file) throws IOException {
+        System.out.println("\n--- Make Payment ---");
+
+        System.out.println("Enter Description: ");
+        String description = scanner.nextLine();
+
+        System.out.println("Enter vendor: ");
+        String vendor = scanner.nextLine();
+
+        System.out.println("Enter amount: ");
+        String amountInput = scanner.nextLine().trim();
+
+        java.math.BigDecimal amount = new java.math.BigDecimal(amountInput);
+        //if its positive flip the sign to negative
+        if (amount.compareTo(BigDecimal.ZERO) > 0) {
+            amount = amount.negate();
+        }
+
+        Transaction payment = new Transaction(
+                java.time.LocalDate.now(),
+                java.time.LocalTime.now(),
+                description,
+                vendor,
+                amount
+        );
+
+        file.append(payment);
+        System.out.println("Payment recorded successfully");
     }
 
 
