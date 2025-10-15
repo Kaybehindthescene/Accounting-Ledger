@@ -128,6 +128,30 @@ public class AccountingLedger {
         return sum;
     }
 
+    //Deposits only(positive amounts)
+    private static List<Transaction> depositOnly(List<Transaction> input) {
+        var out = new ArrayList<Transaction>();
+        for (var t : input) {
+            if (t.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+                out.add(t);
+            }
+        }
+        return out;
+    }
+
+    // Payments only (negative amounts)
+    private static List<Transaction> paymentOnly(List<Transaction> input) {
+        var out = new ArrayList<Transaction>();
+        for (var t : input) {
+            if (t.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+                out.add(t);
+            }
+        }
+        return out;
+    }
+
+
+
 
 
 
