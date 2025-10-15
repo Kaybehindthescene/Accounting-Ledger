@@ -1,7 +1,11 @@
 package com.pluralsight;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.BitSet;
 import java.util.Scanner;
 
 public class AccountingLedger {
@@ -33,5 +37,32 @@ public class AccountingLedger {
             }
         }
 
+        private static void addDeposit(Scanner scanner, TransactionsFile file,) throws IOException {
+            System.out.println("\n--- Add Deposit ---");
+
+            System.out.println("Enter Description:");
+            String description = scanner.nextLine();
+
+            System.out.println("Enter vendor");
+            String vendor = scanner.nextLine();
+
+            System.out.println("Enter Amount:");
+            BigDecimal amount = new BigDecimal(scanner.nextLine());
+
+            Transaction deposit = new Transaction(
+                    LocalDate.now(),
+                    LocalTime.now(),
+                    description,
+                    vendor,
+                    amount
+            );
+
+            file.append(deposit);
+            System.out.println("Deposit added successfully");
+        }
+
+
     }
+
+
 }
