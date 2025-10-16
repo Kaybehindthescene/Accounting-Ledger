@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 import java.util.Scanner;
 /*
@@ -40,6 +39,7 @@ public class AccountingLedger {
             System.out.println("L) View Ledger");
             System.out.println("X) Exit");
             System.out.println("Choose an option:");
+
             String choice = scanner.nextLine().trim().toUpperCase();
 
             if (choice.equals("D")) {
@@ -106,8 +106,9 @@ public class AccountingLedger {
 
         System.out.println("Enter amount: ");
         String amountInput = scanner.nextLine().trim();
+        BigDecimal amount = new BigDecimal(amountInput);
 
-        java.math.BigDecimal amount = new java.math.BigDecimal(amountInput);
+
         //if its positive flip the sign to negative
         if (amount.compareTo(BigDecimal.ZERO) > 0) {
             amount = amount.negate();
@@ -148,23 +149,23 @@ public class AccountingLedger {
         System.out.println("H) Home");
         System.out.print("Choose: ");
 
-        var sc = new java.util.Scanner(System.in);
-        var c = sc.nextLine().trim().toUpperCase();
+        Scanner sc = new java.util.Scanner(System.in);
+        String choice = sc.nextLine().trim().toUpperCase();
 
-        if (c.equals("A")) {
-            for (var t : newestFirst(all)) System.out.println(t.toCsvLine());
-        } else if (c.equals("D")) {
-            for (var t : newestFirst(depositsOnly(all))) System.out.println(t.toCsvLine());
-        } else if (c.equals("P")) {
-            for (var t : newestFirst(paymentsOnly(all))) System.out.println(t.toCsvLine());
-        } else if (c.equals("V")) {
+        if (choice.equals("A")) {
+            for (Transaction t : newestFirst(all)) System.out.println(t.toCsvLine());
+        } else if (choice.equals("D")) {
+            for (Transaction t : newestFirst(depositsOnly(all))) System.out.println(t.toCsvLine());
+        } else if (choice.equals("P")) {
+            for (Transaction t : newestFirst(paymentsOnly(all))) System.out.println(t.toCsvLine());
+        } else if (choice.equals("V")) {
             System.out.print("Vendor search: ");
-            var q = sc.nextLine().trim();
-            var hits = newestFirst(searchByVendor(all, q));
-            for (var t : hits) System.out.println(t.toCsvLine());
-        } else if (c.equals("B")) {
+            String q = sc.nextLine().trim();
+            List<Transaction> results = newestFirst(searchByVendor(all, q));
+            for (Transaction t : results) System.out.println(t.toCsvLine());
+        } else if (choice.equals("B")) {
             System.out.println("Balance: " + balanceOf(all));
-        } else if (c.equals("R")) {
+        } else if (choice.equals("R")) {
             viewReports(file);   // <— new screen (loops until user presses 0)
         } else {
             System.out.println("Back to Home.");
@@ -176,7 +177,7 @@ public class AccountingLedger {
     // It compares both the date and time of each transaction.
     // -------------------------------------------------------------
     private static List<Transaction> newestFirst(List<Transaction> input) {
-        var list = new ArrayList<>(input);
+        List<Transaction> list = new ArrayList<>(input);
         list.sort((a, b) -> {
             int byDate = b.getDate().compareTo(a.getDate());
             if (byDate != 0) return byDate;
@@ -189,8 +190,8 @@ public class AccountingLedger {
     // Deposits increase the total; payments (negative amounts) decrease it.
     // -------------------------------------------------------------
     private static java.math.BigDecimal balanceOf(List<Transaction> input) {
-        var sum = BigDecimal.ZERO;
-        for (var t : input) sum = sum.add(t.getAmount());
+        BigDecimal sum = BigDecimal.ZERO;
+        for (Transaction t : input) sum = sum.add(t.getAmount());
         return sum;
     }
     // -------------------------------------------------------------
@@ -199,8 +200,8 @@ public class AccountingLedger {
     // Used to show all deposits or income transactions.
     // -------------------------------------------------------------
     private static List<Transaction> depositsOnly(List<Transaction> input) {
-        var out = new ArrayList<Transaction>();
-        for (var t : input) {
+        List<Transaction> out = new ArrayList<Transaction>();
+        for (Transaction t : input) {
             if (t.getAmount().compareTo(java.math.BigDecimal.ZERO) > 0) {
                 out.add(t);
             }
@@ -214,20 +215,20 @@ public class AccountingLedger {
     // Used to show all outgoing payments or expenses.
     // -------------------------------------------------------------
     private static List<Transaction> paymentsOnly(List<Transaction> input) {
-        var out = new ArrayList<Transaction>();
-        for (var t : input) {
+        List<Transaction> result = new ArrayList<Transaction>();
+        for (Transaction t : input) {
             if (t.getAmount().compareTo(java.math.BigDecimal.ZERO) < 0) {
-                out.add(t);
+                result.add(t);
             }
         }
-        return out;
+        return result;
     }
     // Searches transactions for a given vendor name.
     //  vendor contains (case-insensitive)
     private static List<Transaction> searchByVendor(List<Transaction> input, String query) {
-        var q = query.toLowerCase();
-        var out = new ArrayList<Transaction>();
-        for (var t : input) {
+        String q = query.toLowerCase();
+        List<Transaction> out = new ArrayList<Transaction>();
+        for (Transaction t : input) {
             if (t.getVendor().toLowerCase().contains(q)) {
                 out.add(t);
             }
@@ -236,7 +237,7 @@ public class AccountingLedger {
     }
 
 
-    private static void runningBalance(List<Transaction> input) {
+   /* private static void runningBalance(List<Transaction> input) {
         var list = newestFirst(input);
         var running = BigDecimal.ZERO;
 
@@ -247,7 +248,9 @@ public class AccountingLedger {
             running = running.add(t.getAmount());
             System.out.println(t.toCsvLine() + " | balance=$" + running);
         }
-    }
+    }*/
+
+
     // Opens the Reports menu, which provides date-based financial summaries.
     // Options include:
     //   1) Month to Date
@@ -273,12 +276,12 @@ public class AccountingLedger {
             System.out.println("0) Back");
             System.out.print("Choose: ");
 
-            String ch = sc.nextLine().trim();
+            String reportChoice = sc.nextLine().trim();
 
-            if (ch.equals("0")) {
+            if (reportChoice.equals("0")) {
                 System.out.println("Back to the Ledger.");
                 break;
-            } else if (ch.equals("1")) {
+            } else if (reportChoice.equals("1")) {
                 LocalDate start = java.time.LocalDate.now().withDayOfMonth(1);
                 LocalDate end = java.time.LocalDate.now();
                 List<Transaction> list = betweenDates(all, start, end);
@@ -286,7 +289,7 @@ public class AccountingLedger {
                     System.out.println(t.toCsvLine());
                 }
                 System.out.println("\nSubtotal (MTD):" + balanceOf(list));
-            } else if (ch.equals("2")) {   // Previous Month
+            } else if (reportChoice.equals("2")) {   // Previous Month
                 LocalDate firstThis = LocalDate.now().withDayOfMonth(1);
                 LocalDate start = firstThis.minusMonths(1);
                 LocalDate end = firstThis.minusDays(1);
@@ -296,7 +299,7 @@ public class AccountingLedger {
                 }
                 System.out.println("\nSubtotal (Prev Mo): " + balanceOf(list));
 
-            } else if (ch.equals("3")) {   // Year To Date
+            } else if (reportChoice.equals("3")) {   // Year To Date
                 LocalDate start = LocalDate.now().withDayOfYear(1);
                 LocalDate end = LocalDate.now();
                 List<Transaction> list = betweenDates(all, start, end);
@@ -305,7 +308,7 @@ public class AccountingLedger {
                 }
                 System.out.println("\nSubtotal (YTD): " + balanceOf(list));
 
-            } else if (ch.equals("4")) {   // Previous Year
+            } else if (reportChoice.equals("4")) {   // Previous Year
                 LocalDate now = LocalDate.now();
                 LocalDate start = now.withDayOfYear(1).minusYears(1);
                 LocalDate end = now.withDayOfYear(1).minusDays(1);
@@ -315,7 +318,7 @@ public class AccountingLedger {
                 }
                 System.out.println("\nSubtotal (Prev Yr): " + balanceOf(list));
 
-            } else if (ch.equals("5")) {   // Search by Vendor
+            } else if (reportChoice.equals("5")) {   // Search by Vendor
                 System.out.print("Vendor: ");
                 String q = sc.nextLine().trim();
                 List<Transaction> list = searchByVendor(all, q);
@@ -324,7 +327,7 @@ public class AccountingLedger {
                 }
                 System.out.println("\nSubtotal (Vendor): " + balanceOf(list));
 
-            } else if (ch.equals("6")) {   // Custom Range
+            } else if (reportChoice.equals("6")) {   // Custom Range
                 List<Transaction> list = runCustomDateRange(sc, all);
                 for (Transaction t : list) {
                     System.out.println(t.toCsvLine());
@@ -344,7 +347,7 @@ public class AccountingLedger {
             LocalDate startInclusive,
             LocalDate endInclusive) {
 
-        List<Transaction> out = new ArrayList<>();
+        List<Transaction> filteredList = new ArrayList<>();
 
         for (Transaction t : input) {
             LocalDate d = t.getDate();
@@ -352,10 +355,10 @@ public class AccountingLedger {
                     && (d.isEqual(endInclusive) || d.isBefore(endInclusive));
 
             if (withinRange) {
-                out.add(t);
+                filteredList.add(t);
             }
         }
-        return out;
+        return filteredList;
     }
 
     // Allows the user to enter a custom start and end date
