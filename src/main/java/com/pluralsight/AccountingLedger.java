@@ -191,7 +191,7 @@ public class AccountingLedger {
 
         for (var t : list) {
             running = running.add(t.getAmount());
-            System.out.println(t.toCsvLine() + " | balance=" + running);
+            System.out.println(t.toCsvLine() + " | balance=$" + running);
         }
     }
 
