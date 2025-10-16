@@ -124,10 +124,8 @@ public class AccountingLedger {
             for (var t : hits) System.out.println(t.toCsvLine());
         } else if (c.equals("B")) {
             System.out.println("Balance: " + balanceOf(all));
-        else if (c.equals("R")) {
-                viewReportsMenu(new java.util.Scanner(System.in), file);
-            }
-
+        }else if (c.equals("R")) {
+            viewReports(file);   // <— new screen (loops until user presses 0)
         } else {
             System.out.println("Back to Home.");
         }
@@ -172,7 +170,7 @@ public class AccountingLedger {
         return out;
     }
 
-    // 🔍 vendor contains (case-insensitive)
+    //  vendor contains (case-insensitive)
     private static List<Transaction> searchByVendor(List<Transaction> input, String query) {
         var q = query.toLowerCase();
         var out = new ArrayList<Transaction>();
@@ -197,7 +195,26 @@ public class AccountingLedger {
         }
     }
 
-    // secret cheat code
+    private static void viewReports(TransactionsFile file) throws java.io.IOException {
+        var sc  = new java.util.Scanner(System.in);
+        var all = file.loadAll();
+
+        while (true) {
+            System.out.println("\n--- Reports ---");
+            System.out.println("1) Month To Date");
+            System.out.println("2) Previous Month");
+            System.out.println("3) Year To Date");
+            System.out.println("4) Previous Year");
+            System.out.println("5) Search by Vendor");
+            System.out.println("6) Custom Date Range");
+            System.out.println("0) Back");
+            System.out.print("Choose: ");
+
+
+
+
+
+
 
 
 
