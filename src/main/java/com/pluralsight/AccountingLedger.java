@@ -124,8 +124,10 @@ public class AccountingLedger {
             for (var t : hits) System.out.println(t.toCsvLine());
         } else if (c.equals("B")) {
             System.out.println("Balance: " + balanceOf(all));
-        }else if (c.equals("R")) {
-            runningBalance(all);
+        else if (c.equals("R")) {
+                viewReportsMenu(new java.util.Scanner(System.in), file);
+            }
+
         } else {
             System.out.println("Back to Home.");
         }
@@ -196,21 +198,6 @@ public class AccountingLedger {
     }
 
     // secret cheat code
-    private static void cheatBonus(TransactionsFile file) throws IOException{
-        System.out.println("\n------ CHEAT CODE UNLOCKED ------");
-        System.out.println("YOU UNLOCKED AN EXTRA $1000!!!");
-
-        Transaction bonus = new Transaction(
-                java.time.LocalDate.now(),
-                java.time.LocalTime.now(),
-                "Cheat Bonus",
-                "Ledger System",
-                new java.math.BigDecimal("1000.00")
-        );
-
-        file.append(bonus);
-        System.out.println("$1000 bonus has been added to your ledger!\n");
-    }
 
 
 
