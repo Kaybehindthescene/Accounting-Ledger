@@ -9,8 +9,25 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Scanner;
+/*
+ * AccountingLedger.java
+ * This class serves as the main controller for your accounting ledger application.
+ * It handles user input, menu navigation, and interacts with the Transaction
+ * and TransactionsFile classes to record and display  data.
+ *
+ * Features include:
+ *   - Adding deposits and payments
+ *   - Viewing all transactions
+ *   - Searching by vendor
+ *   - Viewing balances and reports
+ */
 
 public class AccountingLedger {
+    // --------------------------------------
+    // The entry point of the program.
+// Displays the main menu and waits for user input.
+// Calls other methods based on the user's choice.
+
     static void main(String[] args) throws IOException {
         Scanner scanner = new Scanner(System.in);
         Path filePath = Path.of("transactions.csv");
@@ -40,6 +57,12 @@ public class AccountingLedger {
         }
 
     }
+
+    // -------------------------------------------------------------
+    // Handles adding a new deposit transaction.
+    // Prompts the user for a description, vendor, and amount.
+    // Then creates a Transaction object and saves it to the CSV file.
+    // -------------------------------------------------------------
 
     private static void addDeposit(Scanner scanner, TransactionsFile file) throws IOException {
         System.out.println("\n--- Add Deposit ---");
@@ -104,7 +127,7 @@ public class AccountingLedger {
         System.out.println("P) Payments only");
         System.out.println("V) Search by vendor");
         System.out.println("B) Show balance");
-        System.out.println("R) Running balance");
+        System.out.println("R) View Reports");
         System.out.println("H) Home");
         System.out.print("Choose: ");
 
