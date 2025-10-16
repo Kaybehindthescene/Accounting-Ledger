@@ -88,6 +88,13 @@ public class AccountingLedger {
         System.out.println("Deposit added successfully");
     }
 
+    // -------------------------------------------------------
+    // Handles adding a payment (expense).
+    // Accepts a positive number but automatically negates it
+    // so it becomes a withdrawal in the ledger.
+    // Then saves the payment transaction to the CSV file.
+    // -------------------------------------------------------
+
     private static void makePayment(Scanner scanner, TransactionsFile file) throws IOException {
         System.out.println("\n--- Make Payment ---");
 
@@ -117,6 +124,16 @@ public class AccountingLedger {
         file.append(payment);
         System.out.println("Payment recorded successfully");
     }
+
+    // -------------------------------------------------------------
+    // Displays the Ledger submenu, where the user can:
+    //   - View all transactions
+    //   - Filter by deposits or payments
+    //   - Search transactions by vendor
+    //  - See balance or open Reports
+    // The method reads all transactions from the file, sorts or filters them,
+    // and displays results based on user input.
+    // -------------------------------------------------------------
 
     private static void viewLedger(TransactionsFile file) throws java.io.IOException {
         var all = file.loadAll();  // Load every transaction from file
@@ -154,7 +171,10 @@ public class AccountingLedger {
         }
     }
 
-
+    // -------------------------------------------------------------
+    // Sorts transactions so the newest entries appear first.
+    // It compares both the date and time of each transaction.
+    // -------------------------------------------------------------
     private static List<Transaction> newestFirst(List<Transaction> input) {
         var list = new ArrayList<>(input);
         list.sort((a, b) -> {
@@ -165,13 +185,19 @@ public class AccountingLedger {
         return list;
     }
 
+    // Calculates the total balance by adding all transaction amounts.
+    // Deposits increase the total; payments (negative amounts) decrease it.
+    // -------------------------------------------------------------
     private static java.math.BigDecimal balanceOf(List<Transaction> input) {
         var sum = BigDecimal.ZERO;
         for (var t : input) sum = sum.add(t.getAmount());
         return sum;
     }
-
+    // -------------------------------------------------------------
     //  positive amounts only
+    // Filters the list of transactions to include only positive amounts.
+    // Used to show all deposits or income transactions.
+    // -------------------------------------------------------------
     private static List<Transaction> depositsOnly(List<Transaction> input) {
         var out = new ArrayList<Transaction>();
         for (var t : input) {
@@ -182,7 +208,11 @@ public class AccountingLedger {
         return out;
     }
 
+
     //  negative amounts only
+    // Filters the list of transactions to include only negative amounts.
+    // Used to show all outgoing payments or expenses.
+    // -------------------------------------------------------------
     private static List<Transaction> paymentsOnly(List<Transaction> input) {
         var out = new ArrayList<Transaction>();
         for (var t : input) {
@@ -192,7 +222,7 @@ public class AccountingLedger {
         }
         return out;
     }
-
+    // Searches transactions for a given vendor name.
     //  vendor contains (case-insensitive)
     private static List<Transaction> searchByVendor(List<Transaction> input, String query) {
         var q = query.toLowerCase();
@@ -204,6 +234,7 @@ public class AccountingLedger {
         }
         return out;
     }
+
 
     private static void runningBalance(List<Transaction> input) {
         var list = newestFirst(input);
@@ -217,6 +248,15 @@ public class AccountingLedger {
             System.out.println(t.toCsvLine() + " | balance=$" + running);
         }
     }
+    // Opens the Reports menu, which provides date-based financial summaries.
+    // Options include:
+    //   1) Month to Date
+    //   2) Previous Month
+    //   3) Year to Date
+    //   4) Previous Year
+    //   5) Search by Vendor
+    //   6) Custom Date Range
+    // Each report filters transactions using betweenDates() and prints totals.
 
     private static void viewReports(TransactionsFile file) throws java.io.IOException {
         Scanner sc = new java.util.Scanner(System.in);
@@ -297,6 +337,8 @@ public class AccountingLedger {
         }
     }
 
+    // Filters transactions between two LocalDate values (inclusive).
+    // Returns only the transactions that fall within the given range.
     private static List<Transaction> betweenDates(
             List<Transaction> input,
             LocalDate startInclusive,
@@ -316,6 +358,8 @@ public class AccountingLedger {
         return out;
     }
 
+    // Allows the user to enter a custom start and end date
+    // to generate a report for a specific range.
     private static List<Transaction> runCustomDateRange(
             Scanner sc,
             List<Transaction> all) {
