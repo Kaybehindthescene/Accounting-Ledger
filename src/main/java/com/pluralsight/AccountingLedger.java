@@ -196,8 +196,8 @@ public class AccountingLedger {
     }
 
     private static void viewReports(TransactionsFile file) throws java.io.IOException {
-        var sc  = new java.util.Scanner(System.in);
-        var all = file.loadAll();
+        Scanner sc  = new java.util.Scanner(System.in);
+        List<Transaction> all = file.loadAll();
 
         while (true) {
             System.out.println("\n--- Reports ---");
@@ -210,14 +210,66 @@ public class AccountingLedger {
             System.out.println("0) Back");
             System.out.print("Choose: ");
 
+            String ch = sc.nextLine().trim();
 
+            if (ch.equals("0")) {
+                System.out.println("Back to the Ledger.");
+                break;
+            } else if (ch.equals("1")) {
+                LocalDate start = java.time.LocalDate.now().withDayOfMonth(1);
+                LocalDate end = java.time.LocalDate.now();
+                List<Transaction> list = betweenDates(all, start, end);
+                for (Transaction t : list){
+                    System.out.println(t.toCsvLine());
+                }
+                System.out.println("\nSubtotal (MTD):" + balanceOf(list));
+            }else if (ch.equals("2")) {   // Previous Month
+                LocalDate firstThis = LocalDate.now().withDayOfMonth(1);
+                LocalDate start = firstThis.minusMonths(1);
+                LocalDate end = firstThis.minusDays(1);
+                List<Transaction> list = betweenDates(all, start, end);
+                for (Transaction t : list) {
+                    System.out.println(t.toCsvLine());
+                }
+                System.out.println("\nSubtotal (Prev Mo): " + balanceOf(list));
 
+            } else if (ch.equals("3")) {   // Year To Date
+                LocalDate start = LocalDate.now().withDayOfYear(1);
+                LocalDate end = LocalDate.now();
+                List<Transaction> list = betweenDates(all, start, end);
+                for (Transaction t : list) {
+                    System.out.println(t.toCsvLine());
+                }
+                System.out.println("\nSubtotal (YTD): " + balanceOf(list));
 
+            } else if (ch.equals("4")) {   // Previous Year
+                LocalDate now = LocalDate.now();
+                LocalDate start = now.withDayOfYear(1).minusYears(1);
+                LocalDate end = now.withDayOfYear(1).minusDays(1);
+                List<Transaction> list = betweenDates(all, start, end);
+                for (Transaction t : list) {
+                    System.out.println(t.toCsvLine());
+                }
+                System.out.println("\nSubtotal (Prev Yr): " + balanceOf(list));
 
+            } else if (ch.equals("5")) {   // Search by Vendor
+                System.out.print("Vendor: ");
+                String q = sc.nextLine().trim();
+                List<Transaction> list = searchByVendor(all, q);
+                for (Transaction t : list) {
+                    System.out.println(t.toCsvLine());
+                }
+                System.out.println("\nSubtotal (Vendor): " + balanceOf(list));
 
+            } else if (ch.equals("6")) {   // Custom Range
+                List<Transaction> list = runCustomDateRange(sc, all);
+                for (Transaction t : list) {
+                    System.out.println(t.toCsvLine());
+                }
+                System.out.println("\nSubtotal (Range): " + balanceOf(list));
 
-
-
-
-
-}
+            } else {
+                System.out.println("Invalid choice.");
+            }
+        }
+    }
