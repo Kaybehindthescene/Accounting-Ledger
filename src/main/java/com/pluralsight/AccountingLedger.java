@@ -25,7 +25,7 @@ public class AccountingLedger {
             System.out.println("Choose an option:");
             String choice = scanner.nextLine().trim().toUpperCase();
 
-            if (choice.equals("D")){
+            if (choice.equals("D")) {
                 addDeposit(scanner, file);
             } else if (choice.equals("P")) {
                 makePayment(scanner, file);
@@ -34,7 +34,7 @@ public class AccountingLedger {
             } else if (choice.equals("X")) {
                 System.out.println("Goodbye!!!!!!");
                 break;
-            }else {
+            } else {
                 System.out.println("Invalid choice! Please try Again!!!");
             }
         }
@@ -124,7 +124,7 @@ public class AccountingLedger {
             for (var t : hits) System.out.println(t.toCsvLine());
         } else if (c.equals("B")) {
             System.out.println("Balance: " + balanceOf(all));
-        }else if (c.equals("R")) {
+        } else if (c.equals("R")) {
             viewReports(file);   // <— new screen (loops until user presses 0)
         } else {
             System.out.println("Back to Home.");
@@ -134,7 +134,7 @@ public class AccountingLedger {
 
     private static List<Transaction> newestFirst(List<Transaction> input) {
         var list = new ArrayList<>(input);
-        list.sort((a, b) ->{
+        list.sort((a, b) -> {
             int byDate = b.getDate().compareTo(a.getDate());
             if (byDate != 0) return byDate;
             return b.getTime().compareTo(a.getTime());
@@ -196,7 +196,7 @@ public class AccountingLedger {
     }
 
     private static void viewReports(TransactionsFile file) throws java.io.IOException {
-        Scanner sc  = new java.util.Scanner(System.in);
+        Scanner sc = new java.util.Scanner(System.in);
         List<Transaction> all = file.loadAll();
 
         while (true) {
@@ -219,11 +219,11 @@ public class AccountingLedger {
                 LocalDate start = java.time.LocalDate.now().withDayOfMonth(1);
                 LocalDate end = java.time.LocalDate.now();
                 List<Transaction> list = betweenDates(all, start, end);
-                for (Transaction t : list){
+                for (Transaction t : list) {
                     System.out.println(t.toCsvLine());
                 }
                 System.out.println("\nSubtotal (MTD):" + balanceOf(list));
-            }else if (ch.equals("2")) {   // Previous Month
+            } else if (ch.equals("2")) {   // Previous Month
                 LocalDate firstThis = LocalDate.now().withDayOfMonth(1);
                 LocalDate start = firstThis.minusMonths(1);
                 LocalDate end = firstThis.minusDays(1);
@@ -273,6 +273,7 @@ public class AccountingLedger {
             }
         }
     }
+
     private static List<Transaction> betweenDates(
             List<Transaction> input,
             LocalDate startInclusive,
@@ -283,7 +284,7 @@ public class AccountingLedger {
         for (Transaction t : input) {
             LocalDate d = t.getDate();
             boolean withinRange = (d.isEqual(startInclusive) || d.isAfter(startInclusive))
-                    && (d.isEqual(endInclusive)   || d.isBefore(endInclusive));
+                    && (d.isEqual(endInclusive) || d.isBefore(endInclusive));
 
             if (withinRange) {
                 out.add(t);
@@ -291,3 +292,19 @@ public class AccountingLedger {
         }
         return out;
     }
+
+    private static List<Transaction> runCustomDateRange(
+            Scanner sc,
+            List<Transaction> all) {
+
+        System.out.print("Start (YYYY-MM-DD): ");
+        LocalDate start = LocalDate.parse(sc.nextLine().trim());
+        System.out.print("End   (YYYY-MM-DD): ");
+        LocalDate end = LocalDate.parse(sc.nextLine().trim());
+        return betweenDates(all, start, end);
+    }
+
+}
+
+
+
