@@ -273,3 +273,21 @@ public class AccountingLedger {
             }
         }
     }
+    private static List<Transaction> betweenDates(
+            List<Transaction> input,
+            LocalDate startInclusive,
+            LocalDate endInclusive) {
+
+        List<Transaction> out = new ArrayList<>();
+
+        for (Transaction t : input) {
+            LocalDate d = t.getDate();
+            boolean withinRange = (d.isEqual(startInclusive) || d.isAfter(startInclusive))
+                    && (d.isEqual(endInclusive)   || d.isBefore(endInclusive));
+
+            if (withinRange) {
+                out.add(t);
+            }
+        }
+        return out;
+    }
