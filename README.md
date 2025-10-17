@@ -116,12 +116,49 @@ H) Home
 
 ---
 
-##  My Favorite Part To Work On  
-> My favorite part of this project was designing the **Reports Menu**.  
-> It was rewarding to use Java’s `LocalDate` class to calculate date ranges such as “Month-to-Date” or “Previous Year.”  
-> I also enjoyed learning how to filter transactions dynamically and compute subtotals for each report section.
+## 💡 My Favorite Part To Work On  
 
----
+My favorite part of this project was creating the hidden **Cheat Code Easter Egg**.  
+I wanted to include something fun and unexpected in the Accounting Ledger that still showed logical and technical skill.  
+When the user types the phrase **“up down left right right down up”** at the main menu, the program detects the sequence and automatically rewards them with a **$1000 Bonus deposit**.  
+
+Here’s the core of the cheat code feature:
+
+```java
+// --- Cheat Code  -------------------------------------------------
+// Triggers ONLY on the exact 7-word sequence:
+// "up down left right right down up" (case-insensitive; spaces allowed)
+private static boolean tryCheatCode(String rawInput, TransactionsFile file) throws java.io.IOException {
+    if (rawInput == null) return false;
+
+    // must be only letters and spaces (no arrows, no punctuation)
+    String s = rawInput.trim();
+    if (!s.matches("(?i)^[a-z\\s]+$")) return false;
+
+    // split into words and normalize
+    String[] parts = s.toUpperCase().split("\\s+");
+    java.util.List<String> words = java.util.Arrays.asList(parts);
+
+    // exact expected sequence
+    java.util.List<String> EXPECTED = java.util.Arrays.asList(
+            "UP", "DOWN", "LEFT", "RIGHT", "RIGHT", "DOWN", "UP"
+    );
+
+    if (!words.equals(EXPECTED)) return false;
+
+    // award the bonus
+    Transaction bonus = new Transaction(
+            java.time.LocalDate.now(),
+            java.time.LocalTime.now(),
+            "Bonus",
+            "Cheat Code",
+            new java.math.BigDecimal("1000.00")
+    );
+    file.append(bonus);
+    System.out.println(" Cheat activated! +$1000.00 added to your ledger.");
+    return true;
+}
+
 
 ##  Author  
 **Created by:** *Caleb Shufford*  
