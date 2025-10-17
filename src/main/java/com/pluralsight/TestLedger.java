@@ -1,5 +1,5 @@
 package com.pluralsight;
-
+// Imports necessary classes for handling files, dates, and lists
 import java.nio.file.Path;
 import java.util.List;
 import java.io.IOException;
@@ -18,7 +18,7 @@ public class TestLedger {
         );
 
         file.append(newTransaction);
-        System.out.println("✅ Added new transaction!");
+        System.out.println("Added new transaction!");
 
 
         List<Transaction> all = file.loadAll();

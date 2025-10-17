@@ -5,16 +5,19 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-
+/*
+ * Represents a financial transaction with date, time, description, vendor, and amount details.
+ */
 
 public class Transaction {
-    private LocalDate date;
-    private LocalTime time;
-    private String description;
-    private String vendor;
-    private BigDecimal amount;
+    // fields show the property of a transaction
+    private LocalDate date; // Date of when transaction occurred
+    private LocalTime time; // time when transaction occurred
+    private String description; // description of what the transaction was
+    private String vendor; // vendor of what transaction comes from
+    private BigDecimal amount; // the total amount of the transaction
 
-
+// constructor for initializing the variable
     public Transaction(LocalDate date, LocalTime time, String description, String vendor, BigDecimal amount){
         this.date = date;
         this.time = time;
@@ -25,28 +28,29 @@ public class Transaction {
 
 
     //getter methods
+    //getter to get date
     public LocalDate getDate() {
         return date;
     }
-
+    // getter to get time
     public LocalTime getTime() {
         return time;
     }
-
+    // getter to get description
     public String getDescription() {
         return description;
     }
-
+    //getter to get vendor
     public String getVendor() {
         return vendor;
     }
-
+    // getter to get amount
     public BigDecimal getAmount() {
         return amount;
     }
 
     public String toCsvLine() {
-//Adding a formatter to my time so it could be in the format of the model
+    //Adding a formatter to my time so it could be in the format of the model
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
         String formattedTime = time.format(timeFormatter);
@@ -63,7 +67,7 @@ public class Transaction {
            throw new IllegalArgumentException("Bad Csv:" + line);
        }
 
-       //parse the fields and add a trim so the spaces wont be there
+       //parse the fields and add a trim so the spaces won't be there
        var date = LocalDate.parse(parts[0].trim());
        var time = LocalTime.parse(parts[1].trim());
        var description = parts[2].trim();

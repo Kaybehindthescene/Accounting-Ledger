@@ -373,7 +373,7 @@ public class AccountingLedger {
 
     // --- Cheat Code -------------------------------------------------
 // Triggers ONLY on the exact 7-word sequence:
-// "up down left right right down up" (case-insensitive; spaces allowed)
+// "up up down  down left right left  right b a start" (case-insensitive; spaces allowed)
     private static boolean tryCheatCode(String rawInput, TransactionsFile file) throws java.io.IOException {
         if (rawInput == null) return false;
 
