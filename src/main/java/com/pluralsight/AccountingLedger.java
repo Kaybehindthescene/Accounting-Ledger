@@ -143,7 +143,6 @@ public class AccountingLedger {
         System.out.println("A) All (newest first)");
         System.out.println("D) Deposits only");
         System.out.println("P) Payments only");
-        System.out.println("V) Search by vendor");
         System.out.println("B) Show balance");
         System.out.println("R) View Reports");
         System.out.println("H) Home");
@@ -158,11 +157,6 @@ public class AccountingLedger {
             for (Transaction t : newestFirst(depositsOnly(all))) System.out.println(t.toCsvLine());
         } else if (choice.equals("P")) {
             for (Transaction t : newestFirst(paymentsOnly(all))) System.out.println(t.toCsvLine());
-        } else if (choice.equals("V")) {
-            System.out.print("Vendor search: ");
-            String q = sc.nextLine().trim();
-            List<Transaction> results = newestFirst(searchByVendor(all, q));
-            for (Transaction t : results) System.out.println(t.toCsvLine());
         } else if (choice.equals("B")) {
             System.out.println("Balance: " + balanceOf(all));
         } else if (choice.equals("R")) {
@@ -223,19 +217,6 @@ public class AccountingLedger {
         }
         return result;
     }
-    // Searches transactions for a given vendor name.
-    //  vendor contains (case-insensitive)
-    private static List<Transaction> searchByVendor(List<Transaction> input, String query) {
-        String q = query.toLowerCase();
-        List<Transaction> out = new ArrayList<Transaction>();
-        for (Transaction t : input) {
-            if (t.getVendor().toLowerCase().contains(q)) {
-                out.add(t);
-            }
-        }
-        return out;
-    }
-
 
    /* private static void runningBalance(List<Transaction> input) {
         var list = newestFirst(input);
@@ -260,9 +241,8 @@ public class AccountingLedger {
     //   5) Search by Vendor
     //   6) Custom Date Range
     // Each report filters transactions using betweenDates() and prints totals.
-
     private static void viewReports(TransactionsFile file) throws java.io.IOException {
-        Scanner sc = new java.util.Scanner(System.in);
+        Scanner sc = new Scanner(System.in);
         List<Transaction> all = file.loadAll();
 
         while (true) {
@@ -279,65 +259,79 @@ public class AccountingLedger {
             String reportChoice = sc.nextLine().trim();
 
             if (reportChoice.equals("0")) {
-                System.out.println("Back to the Ledger.");
+                System.out.println("Back to Ledger.");
                 break;
-            } else if (reportChoice.equals("1")) {
-                LocalDate start = java.time.LocalDate.now().withDayOfMonth(1);
-                LocalDate end = java.time.LocalDate.now();
+            } else if (reportChoice.equals("1")) {           // Month To Date
+                LocalDate start = LocalDate.now().withDayOfMonth(1);
+                LocalDate end   = LocalDate.now();
                 List<Transaction> list = betweenDates(all, start, end);
-                for (Transaction t : list) {
-                    System.out.println(t.toCsvLine());
-                }
-                System.out.println("\nSubtotal (MTD):" + balanceOf(list));
-            } else if (reportChoice.equals("2")) {   // Previous Month
-                LocalDate firstOfMonth = LocalDate.now().withDayOfMonth(1);
-                LocalDate startDate = firstOfMonth.minusMonths(1);
-                LocalDate endDate = firstOfMonth.minusDays(1);
-                List<Transaction> list = betweenDates(all, startDate, endDate);
-                for (Transaction t : list) {
-                    System.out.println(t.toCsvLine());
-                }
+                for (Transaction t : list) System.out.println(t.toCsvLine());
+                System.out.println("\nSubtotal (MTD): " + balanceOf(list));
+
+            } else if (reportChoice.equals("2")) {            // Previous Month
+                LocalDate firstThis = LocalDate.now().withDayOfMonth(1);
+                LocalDate start = firstThis.minusMonths(1);
+                LocalDate end   = firstThis.minusDays(1);
+                List<Transaction> list = betweenDates(all, start, end);
+                for (Transaction t : list) System.out.println(t.toCsvLine());
                 System.out.println("\nSubtotal (Prev Mo): " + balanceOf(list));
 
-            } else if (reportChoice.equals("3")) {   // Year To Date
+            } else if (reportChoice.equals("3")) {            // Year To Date
                 LocalDate start = LocalDate.now().withDayOfYear(1);
-                LocalDate end = LocalDate.now();
+                LocalDate end   = LocalDate.now();
                 List<Transaction> list = betweenDates(all, start, end);
-                for (Transaction t : list) {
-                    System.out.println(t.toCsvLine());
-                }
+                for (Transaction t : list) System.out.println(t.toCsvLine());
                 System.out.println("\nSubtotal (YTD): " + balanceOf(list));
 
-            } else if (reportChoice.equals("4")) {   // Previous Year
+            } else if (reportChoice.equals("4")) {            // Previous Year
                 LocalDate now = LocalDate.now();
                 LocalDate start = now.withDayOfYear(1).minusYears(1);
-                LocalDate end = now.withDayOfYear(1).minusDays(1);
+                LocalDate end   = now.withDayOfYear(1).minusDays(1);
                 List<Transaction> list = betweenDates(all, start, end);
-                for (Transaction t : list) {
-                    System.out.println(t.toCsvLine());
-                }
+                for (Transaction t : list) System.out.println(t.toCsvLine());
                 System.out.println("\nSubtotal (Prev Yr): " + balanceOf(list));
 
-            } else if (reportChoice.equals("5")) {   // Search by Vendor
+            } else if (reportChoice.equals("5")) {  // Search by Vendor
                 System.out.print("Vendor: ");
                 String q = sc.nextLine().trim();
-                List<Transaction> list = searchByVendor(all, q);
-                for (Transaction t : list) {
-                    System.out.println(t.toCsvLine());
-                }
-                System.out.println("\nSubtotal (Vendor): " + balanceOf(list));
 
-            } else if (reportChoice.equals("6")) {   // Custom Range
-                List<Transaction> list = runCustomDateRange(sc, all);
-                for (Transaction t : list) {
-                    System.out.println(t.toCsvLine());
+                if (q.isEmpty()) {
+                    System.out.println("No vendor entered. Returning to Reports.");
+                } else {
+                    List<Transaction> matches = searchByVendor(all, q);
+
+                    if (matches.isEmpty()) {
+                        System.out.println("No transactions found for vendor: " + q);
+                    } else {
+                        List<Transaction> sorted = newestFirst(matches);
+                        for (Transaction t : sorted) {
+                            System.out.println(t.toCsvLine());
+                        }
+                        System.out.println("\nSubtotal (Vendor): " + balanceOf(matches));
+                    }
                 }
+            } else if (reportChoice.equals("6")) {            // Custom Range
+                List<Transaction> list = runCustomDateRange(sc, all);
+                for (Transaction t : list) System.out.println(t.toCsvLine());
                 System.out.println("\nSubtotal (Range): " + balanceOf(list));
 
             } else {
                 System.out.println("Invalid choice.");
             }
         }
+    }
+
+    // 🔍 Filters transactions by vendor name (case-insensitive)
+    private static List<Transaction> searchByVendor(List<Transaction> input, String query) {
+        String lowerQuery = query.toLowerCase();
+        List<Transaction> result = new ArrayList<>();
+
+        for (Transaction t : input) {
+            if (t.getVendor().toLowerCase().contains(lowerQuery)) {
+                result.add(t);
+            }
+        }
+        return result;
     }
 
     // Filters transactions between two LocalDate values (inclusive).
