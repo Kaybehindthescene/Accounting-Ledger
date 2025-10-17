@@ -116,7 +116,7 @@ H) Home
 
 ---
 
-## 💡 My Favorite Part To Work On  
+##  My Favorite Part To Work On  
 
 My favorite part of this project was creating the hidden **Cheat Code Easter Egg**.  
 I wanted to include something fun and unexpected in the Accounting Ledger that still showed logical and technical skill.  
