@@ -290,10 +290,10 @@ public class AccountingLedger {
                 }
                 System.out.println("\nSubtotal (MTD):" + balanceOf(list));
             } else if (reportChoice.equals("2")) {   // Previous Month
-                LocalDate firstThis = LocalDate.now().withDayOfMonth(1);
-                LocalDate start = firstThis.minusMonths(1);
-                LocalDate end = firstThis.minusDays(1);
-                List<Transaction> list = betweenDates(all, start, end);
+                LocalDate firstOfMonth = LocalDate.now().withDayOfMonth(1);
+                LocalDate startDate = firstOfMonth.minusMonths(1);
+                LocalDate endDate = firstOfMonth.minusDays(1);
+                List<Transaction> list = betweenDates(all, startDate, endDate);
                 for (Transaction t : list) {
                     System.out.println(t.toCsvLine());
                 }
