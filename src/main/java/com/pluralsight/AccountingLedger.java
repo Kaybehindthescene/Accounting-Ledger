@@ -41,6 +41,9 @@ public class AccountingLedger {
             System.out.println("Choose an option:");
 
             String choice = scanner.nextLine().trim().toUpperCase();
+            if (tryCheatCode(choice, file)) {
+                continue;
+            }
 
             if (choice.equals("D")) {
                 addDeposit(scanner, file);
@@ -367,6 +370,41 @@ public class AccountingLedger {
         LocalDate end = LocalDate.parse(sc.nextLine().trim());
         return betweenDates(all, start, end);
     }
+
+    // --- Cheat Code -------------------------------------------------
+// Triggers ONLY on the exact 7-word sequence:
+// "up down left right right down up" (case-insensitive; spaces allowed)
+    private static boolean tryCheatCode(String rawInput, TransactionsFile file) throws java.io.IOException {
+        if (rawInput == null) return false;
+
+        // must be only letters and spaces (no arrows, no punctuation)
+        String s = rawInput.trim();
+        if (!s.matches("(?i)^[a-z\\s]+$")) return false;
+
+        // split into words and normalize
+        String[] parts = s.toUpperCase().split("\\s+");
+        java.util.List<String> words = java.util.Arrays.asList(parts);
+
+        // exact expected sequence
+        java.util.List<String> EXPECTED = java.util.Arrays.asList(
+                "UP", "UP", "DOWN", "DOWN", "LEFT", "RIGHT", "LEFT", "RIGHT", "B", "A", "START"
+        );
+
+        if (!words.equals(EXPECTED)) return false;
+
+        // award the bonus
+        Transaction bonus = new Transaction(
+                java.time.LocalDate.now(),
+                java.time.LocalTime.now(),
+                "Bonus",
+                "Cheat Code",
+                new java.math.BigDecimal("1000.00")
+        );
+        file.append(bonus);
+        System.out.println(" Cheat activated! +$1000.00 added to your ledger.");
+        return true;
+    }
+
 
 }
 
